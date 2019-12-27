@@ -46,7 +46,6 @@ class MyPanel extends Panel {
         } catch (IOException e) {
             e.printStackTrace();
         }
-//        image = Toolkit.getDefaultToolkit().getImage("./resource/TrayIcon.jpg");
     }
 
     public void paint(Graphics g){

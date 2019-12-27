@@ -161,11 +161,10 @@ import org.imgscalr.Scalr.Rotation;
  * execution of queued image operations. If a different type of
  * {@link ExecutorService} is desired, again, simply overriding the
  * {@link #createService()} method of choice is the right way to do that.
- * 
+ *
  * @author Riyad Kalla (software@thebuzzmedia.com)
  * @since 3.2
  */
-@SuppressWarnings("javadoc")
 public class AsyncScalr {
 	/**
 	 * System property name used to set the number of threads the default
@@ -217,7 +216,7 @@ public class AsyncScalr {
 	 * {@link ExecutorService#awaitTermination(long, TimeUnit)} after issuing a
 	 * shutdown command to try and wait until the service has finished all
 	 * tasks.
-	 * 
+	 *
 	 * @return the current {@link ExecutorService} used by this class to process
 	 *         scale operations.
 	 */
@@ -492,7 +491,7 @@ public class AsyncScalr {
 	 * More or less a copy of the hidden class backing the
 	 * {@link Executors#defaultThreadFactory()} method, but exposed here to make
 	 * it easier for implementors to extend and customize.
-	 * 
+	 *
 	 * @author Doug Lea
 	 * @author Riyad Kalla (software@thebuzzmedia.com)
 	 * @since 4.0
@@ -556,7 +555,7 @@ public class AsyncScalr {
 	 * want this (common) customization to the {@link Thread}s used internally
 	 * by {@link AsyncScalr} to process images, but don't want to have to write
 	 * the implementation.
-	 * 
+	 *
 	 * @author Riyad Kalla (software@thebuzzmedia.com)
 	 * @since 4.0
 	 */

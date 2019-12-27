@@ -50,7 +50,7 @@ public class SystemTrayApp {
         // create a popup menu
         popup = new PopupMenu();
         // create menu item for the default action
-        MenuItem defaultItem = new MenuItem("exit");
+        MenuItem defaultItem = new MenuItem("EXIT");
         defaultItem.addActionListener(listener);
         popup.add(defaultItem);
         /// ... add other items
@@ -90,11 +90,11 @@ public class SystemTrayApp {
             arr.add(string);
 
         }
-        try {
-            ProcessCommandUtil.executeCommand(arr);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        try {
+//            ProcessCommandUtil.executeCommand(arr);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
         MenuItem serverItem = new MenuItem("Started Port : " + "53935");
 //        defaultItem.addActionListener(listener);
         popup.add(serverItem);

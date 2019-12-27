@@ -1,4 +1,4 @@
-package bsta.main;
+package bsta.main.util;
 
 
 
@@ -17,6 +17,37 @@ import bsta.main.thread.WriteStdoutThread;
  * @author M.Oshiro
  */
 public class ProcessCommandUtil {
+
+    /**
+     * コマンドの実行
+     *
+     * @param command 実行コマンドのリスト
+     * @retrun 実行したコマンドの標準出力
+     * @throws Exception
+     */
+    public static  Hashtable<Class<?>, Object> executeCommandPlain(List<String> command) throws Exception {
+
+        Hashtable<Class<?>, Object> ht = new Hashtable<Class<?>, Object>();
+
+        // コマンド実行
+        try {
+            ProcessBuilder pbNoLock = new ProcessBuilder();
+
+            pbNoLock.redirectErrorStream(false);
+            pbNoLock.command(command);
+
+            Process processWatched = pbNoLock.start();
+
+            ht.put(Process.class, processWatched);
+            ht.put(ProcessBuilder.class, pbNoLock);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+
+        return ht;
+    }
     /**
      * コマンドの実行
      *
