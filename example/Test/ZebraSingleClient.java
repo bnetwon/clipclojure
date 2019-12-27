@@ -8,7 +8,6 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.sql.PreparedStatement;
 
 
 
@@ -36,22 +35,6 @@ public class ZebraSingleClient implements Serializable{
     private BufferedWriter      gWriter;
 
 
-    /** 用紙サイズ（1：B8、2：B9） */   // 20140610現在 ： B9のみ
-    private String paper_size = "2";
-//    private String paper_size = new String();
-    /** 用紙サイズセット */
-    public void setPaperSize(String paper_size) {
-        if (paper_size == null) {
-            this.paper_size = "";
-        } else {
-            this.paper_size = paper_size.trim();
-        }
-    }
-    /** 用紙サイズ取得 */
-    public String getPaperSize() {
-        return paper_size;
-    }
-
 
     /** 印刷枚数 */   // 20140610現在 ： セットなしで、１枚
     private int printNo;
@@ -69,11 +52,10 @@ public class ZebraSingleClient implements Serializable{
      * 用紙印刷クラスのコンストラクタ
      */
     public ZebraSingleClient () {
-        paper_size = "";    // 用紙サイズ（1：B8、2：B9）
         printNo = 1;        // 印刷枚数
     }
 
-    public int zebra_prt_test(String gHost) throws Exception  {
+    public int zebraSocketStart(String gHost) throws Exception  {
         DEBUG_SW=1;
         int flg_error = 0;
         //---------------------------------------------------------------------
@@ -147,10 +129,6 @@ public class ZebraSingleClient implements Serializable{
             }
             flg_error = 381;
             //**********Print Log**********
-//            RKXGlogUtil.log(
-//                RKXGlogUtil.LV_INFO,RKXGlogUtil.LOG_ERR,RKXGlogUtil.ST_ERROR,
-//                null,null,gotno,"RKXG0067",
-//                " Zebra ソケット接続エラー（切断）381 " + e.toString(),null);
             gSocket.setSoTimeout(0);
             gSocket.close();
             return flg_error;
@@ -161,18 +139,11 @@ public class ZebraSingleClient implements Serializable{
             }
             flg_error = 382;
             //**********Print Log**********
-//            RKXGlogUtil.log(
-//                RKXGlogUtil.LV_INFO,RKXGlogUtil.LOG_ERR,RKXGlogUtil.ST_ERROR,
-//                null,null,gotno,"RKXG0067",
-//                "Zebra ソケット接続エラー（切断）：382 " + e.toString(),null);
             gSocket.setSoTimeout(0);
             gSocket.close();
             return flg_error;
         }
         //**********Print Log**********
-//        RKXGlogUtil.log(
-//            RKXGlogUtil.LV_INFO,RKXGlogUtil.LOG_ERR,RKXGlogUtil.ST_ERROR,
-//            null,null,    gotno,"RKXG0067",   "Zebra print_point End",    null);
         sleep(150);
         if( DEBUG_SW == 1 ){
             System.out.println("***** Zebra 切断(Socket) END *****");
@@ -188,7 +159,7 @@ public class ZebraSingleClient implements Serializable{
         //---------------------------------------------------------------------
         try {
             if( DEBUG_SW == 1 ){
-                System.out.println("*** Zebra プリント START *** paper_size:"+paper_size);
+                System.out.println("*** Zebra プリント START *** ");
                 System.out.println("*----------------------------------------------");
             }
             // ZebraPrinter・ステータス確認
@@ -265,7 +236,7 @@ public class ZebraSingleClient implements Serializable{
         return 0;
     }
 
-    public int zebra_printfl(String str) throws Exception{
+    public int zebraPrintString(String str) throws Exception{
         int flg_error = 0;
         try{
             gWriter.write(str);
@@ -687,6 +658,7 @@ e.printStackTrace();
      ***************************************************************************
      */
     public void zebra_p_end() throws Exception  {
+        String paper_size = "1";
         if( DEBUG_SW == 1 ){
             System.out.println( "***** Zebra・終了処理・印刷:zebra_p_end() *****" );
         }
@@ -722,140 +694,6 @@ e.printStackTrace();
         }
     }
 
-
-    /**
-     ***************************************************************************
-     * 商品名称を変換する        chSkuName
-     * @param   skuName     (String)
-     * @return  String
-     * @throws Exception
-     ***************************************************************************
-     */
-    public String chSkuName(String skuName) throws Exception {
-        String wBuff;
-        String wOneStr;
-        String outBuff;
-        //初期処理
-        wBuff = skuName;
-        outBuff = "";
-        //文字化け対応、アンダーバースペース変換
-        for (int i = 0; i < wBuff.length(); i++) {
-            wOneStr = wBuff.substring(i,i+1);
-            if (wOneStr.equals("＿")) {
-                // "＿" ⇒ "　"
-                outBuff = outBuff + "　";
-            }else if (wOneStr.equals("_")) {
-                // "_" ⇒ " "
-                outBuff = outBuff + " ";
-            }else if (wOneStr.equals("\uFF0D") || wOneStr.equals("\u2015")) {
-                // "−" ⇒ "ー"
-                outBuff = outBuff + "\u30FC";
-            }else if (wOneStr.equals("\uFF5E")) {
-                // "〜" ⇒ "〜"
-                outBuff = outBuff + "\u301C";
-            }else {
-                outBuff = outBuff + wOneStr;
-            }
-        }
-        //終了処理
-        return outBuff;
-    }
-
-
-    /**
-     ***************************************************************************
-     * JAN判定            JanSW
-     * @param   jan     (String)
-     * @return  int     (0:JAN判定不能,1:UPC-A,2:UPC-E,3:JAN 8,4:JAN 13)
-     * @throws Exception
-     ***************************************************************************
-     */
-    public int JanSW(String jan)
-        throws Exception {
-        //---------------------------------------------
-        // resultの意味
-        // 0:JAN判定不能
-        // 1:UPC-A
-        // 2:UPC-E
-        // 3:JAN 8
-        // 4:JAN 13
-        //---------------------------------------------
-        int result = 0;
-        //JANをバーコード印刷用に変換する
-        switch (jan.length()) {
-        case 7:
-            if (jan.substring(0,1).equals("0")) {
-                //UPC-E
-                result=2;
-            }
-            break;
-        case 8:
-            if (jan.substring(0,1).equals("0")) {
-                //UPC-E
-                result=2;
-            } else {
-                //JAN 8
-                result=3;
-            }
-            break;
-        case 11:
-            //UPC-A
-            result=1;
-            break;
-        case 12:
-            //UPC-A
-            result=1;
-            break;
-        case 13:
-            //JAN 13
-            result=4;
-            break;
-        }
-        //終了処理
-        return result;
-    }
-
-
-    /**
-     ***************************************************************************
-     * JANをバーコード印刷用に変換する        berJan
-     * @param   jan     (String)
-     * @return  String
-     * @throws Exception
-     ***************************************************************************
-     */
-    public String berJan(String jan)
-        throws Exception {
-        String outbuf = jan;
-        //JANをバーコード印刷用に変換する
-        switch (jan.length()) {
-        case 7:
-            if (jan.substring(0,1).equals("0")) {
-                //UPC-E
-                outbuf = jan.substring(1);
-            }
-            break;
-        case 8:
-            if (jan.substring(0,1).equals("0")) {
-                //UPC-E
-                outbuf = jan.substring(1,7);
-            } else {
-                //JAN 8
-                outbuf = jan.substring(0,jan.length() - 1);
-            }
-            break;
-        case 12:
-            //UPC-A
-            outbuf = jan.substring(0,jan.length() - 1);
-            break;
-        case 13:
-            //JAN 13
-            outbuf = jan.substring(0,jan.length() - 1);
-            break;
-        }
-        //終了処理
-        return outbuf;
-    }
 
 
     /**
@@ -1050,10 +888,10 @@ e.printStackTrace();
 
 		try {
 			int flg = 0;
-			flg = zclient.zebra_prt_test(ipad);
+			flg = zclient.zebraSocketStart(ipad);
 			//if(flg == 0) rkxg0067.zebra_close();
 
-			flg = zclient.zebra_printfl(content);
+			flg = zclient.zebraPrintString(content);
 
 
 			zclient.zebra_close();
