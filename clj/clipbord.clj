@@ -210,3 +210,5 @@
 ;Here's a concrete example in JS.
 ;
 ;Transducers
+
+;(-> "asDs" (char-array) (#(map ( fn[a] (let[ uppercase (.charAt (clojure.string/upper-case a) 0)]  (if (= uppercase a) (list \_ a) a )) )%)) (flatten)(clojure.string/join))
