@@ -1,21 +1,21 @@
 (ns user
   (:require [clojure.tools.namespace.repl :as tnr]
             [clojure.repl]
-            [proto-repl.saved-values]
+            ;[proto-repl.saved-values]
             [clojure.reflect :as cr]
             [clojure.pprint :as pp]
             [seesaw.core]
             [seesaw.table]
             )
   (:import [java.awt Toolkit] [java.awt.datatransfer Clipboard DataFlavor StringSelection])
-  (:use [seesaw core table clojure.repl])
-)
+  (:use [seesaw core table][clojure.repl])
+  )
 (defn ins->map[obj](->> obj
      cr/reflect
      :members (map #( (fn[x] ( into {}  x)) %)) vec
         ))
 (def classColumnName [ :name :return-type :declaring-class :parameter-types :exception-types :flags ])
-(def classCN [{:key :name, :text "name", :class java.lang.String}
+(def members-c-n [{:key :name, :text "name", :class java.lang.String}
  {:key :return-type, :text "return-type", :class java.lang.Object}
  {:key :declaring-class, :text "declaring-class", :class java.lang.Class}
  {:key :parameter-types, :text "parameter-types", :class java.lang.Object}
@@ -23,7 +23,7 @@
  {:key :flags, :text "flags", :class java.lang.Object} ])
 
 (defn ct-model[obj ](seesaw.table/table-model
-                 :columns classCN
+                 :columns members-c-n
                  :rows  obj
                          )
 )
@@ -96,61 +96,107 @@
 
 (defn rrten[ r rs ] (if (re-find r rs) rs ))
 
-
-(defn- ^javax.swing.table.DefaultTableCellRenderer proxy-table-renderer
-  [fnx]
-  (let []
+(defn default-list-cell-renderer
+  [render-fn]
+  (if (instance? javax.swing.ListCellRenderer render-fn)
+    render-fn
+    (proxy [javax.swing.DefaultListCellRenderer] []
+      (getListCellRendererComponent [component value index selected? focus?]
+        (let [^javax.swing.DefaultListCellRenderer this this]
+          (proxy-super getListCellRendererComponent component value index selected? focus?)
+          (render-fn this { :this      this
+                            :component component
+                            :value     value
+                            :index     index
+                            :selected? selected?
+                            :focus?    focus? })
+          this)))))
+(defn ^javax.swing.table.DefaultTableCellRenderer default-table-cell-renderer
+  [render-fn]
+  (if (instance? javax.swing.table.DefaultTableCellRenderer render-fn)
+    render-fn
     (proxy [javax.swing.table.DefaultTableCellRenderer] []
       (^java.awt.Component getTableCellRendererComponent [^javax.swing.JTable table, ^Object value,
-                ^Boolean isSelected, ^Boolean hasFocus, ^Integer row, ^Integer column]
-                (let [supermehod (proxy-super getTableCellRendererComponent table value isSelected hasFocus row column )](supermehod))
+                ^Boolean selected?, ^Boolean focus?, ^Integer row, ^Integer column]
+                (let [^javax.swing.table.DefaultTableCellRenderer this this]
+                (proxy-super getTableCellRendererComponent table value selected? focus? row column )
+                ;(proxy-super getListCellRendererComponent component value index selected? focus?)
+                (render-fn this { :this      this
+                                  :component table
+                                  :value     value
+                                  :selected? selected?
+                                  :focus?    focus?
+                                  :row       row
+                                  :column    column})
+                (apply config! this [:background "#aaaaee"]));(todo this (.setBackgroundColor "#000033") ))
                 ; int columnModelIndex = table.getColumnModel().getColumn(column).getModelIndex();
-      )
-      ;proxy-super addRow values
-    )
-  )
-)
+      ))))
+(defn omap[obj]
+  (let[ obj-map    (->> obj clojure.reflect/reflect :members
+                        (map #( (fn[x] ( into {}  x)) %)) vec )]
+  obj-map))
+(defn tablemap[obj]
+  (let[ obj-map    (->> obj clojure.reflect/reflect :members
+                        (map #( (fn[x] ( into {}  x)) %)) vec )
+        tablemodel (seesaw.table/table-model
+                    :columns members-c-n
+                    :rows  obj-map  )
+        table      (table :model tablemodel)
+                        ]
+ (-> {} (assoc :obj-map    obj-map)
+        (assoc :tablemodel tablemodel)
+        (assoc :table      table)
+ )))
+ (defn tableframemap[obj]
+   (let[ tablemap   (tablemap obj )
+         cframe     (center-frame (:table tablemap)) ]
+   (-> tablemap (assoc :frame cframe ))
+  ))
 
-(defn- ^javax.swing.table.DefaultTableModel proxy-table-model
-  [column-names column-key-map column-classes]
-  (let [full-values (atom [])]
-    (proxy [javax.swing.table.DefaultTableModel] [(object-array column-names) 0]
-      (isCellEditable [row col] false)
-      (setRowCount [^Integer rows]
-        ; trick to force proxy-super macro to see correct type to avoid reflection.
-        (swap! full-values (fn [v]
-                             (if (< rows (count v))
-                               (subvec v rows)
-                               (vec (concat v (take (- (count v) rows) (constantly nil)))))))
-        (let [^javax.swing.table.DefaultTableModel this this]
-          (proxy-super setRowCount rows)))
-      (addRow [^objects values]
-        (swap! full-values conj (last values))
-        ; TODO reflection - I can't get rid of the reflection here without crashes
-        ; It has something to do with Object[] vs. Vector overrides.
-        (proxy-super addRow values))
-      (insertRow [row ^objects values]
-        (swap! full-values insert-at row (last values))
-        ; TODO reflection - I can't get rid of the reflection here without crashes
-        ; It has something to do with Object[] vs. Vector overrides.
-        (proxy-super insertRow row values))
-      (removeRow [row]
-        (swap! full-values remove-at row)
-        (let [^javax.swing.table.DefaultTableModel this this]
-          (proxy-super removeRow row)))
-      ; TODO this stuff is an awful hack and now that I'm wiser, I should fix it.
-      (getValueAt [row col]
-        (if (= -1 row col)
-          column-key-map
-          (if (= -1 col)
-            (get @full-values row)
-            (let [^javax.swing.table.DefaultTableModel this this]
-              (proxy-super getValueAt row col)))))
-      (setValueAt [value row col]
-        (if (= -1 col)
-          (swap! full-values assoc row value)
-          (let [^javax.swing.table.DefaultTableModel this this]
-            (proxy-super setValueAt value row col))))
-      (getColumnClass [^Integer c]
-        (proxy-super getColumnClass c)
-        (nth column-classes c)))))
+; (defn- ^javax.swing.table.DefaultTableModel proxy-table-model
+;   [column-names column-key-map column-classes]
+;   (let [full-values (atom [])]
+;     (proxy [javax.swing.table.DefaultTableModel] [(object-array column-names) 0]
+;       (isCellEditable [row col] false)
+;       (setRowCount [^Integer rows]
+;         ; trick to force proxy-super macro to see correct type to avoid reflection.
+;         (swap! full-values (fn [v]
+;                              (if (< rows (count v))
+;                                (subvec v rows)
+;                                (vec (concat v (take (- (count v) rows) (constantly nil)))))))
+;         (let [^javax.swing.table.DefaultTableModel this this]
+;           (proxy-super setRowCount rows)))
+;       (addRow [^objects values]
+;         (swap! full-values conj (last values))
+;         ; TODO reflection - I can't get rid of the reflection here without crashes
+;         ; It has something to do with Object[] vs. Vector overrides.
+;         (proxy-super addRow values))
+;       (insertRow [row ^objects values]
+;         (swap! full-values insert-at row (last values))
+;         ; TODO reflection - I can't get rid of the reflection here without crashes
+;         ; It has something to do with Object[] vs. Vector overrides.
+;         (proxy-super insertRow row values))
+;       (removeRow [row]
+;         (swap! full-values remove-at row)
+;         (let [^javax.swing.table.DefaultTableModel this this]
+;           (proxy-super removeRow row)))
+;       ; TODO this stuff is an awful hack and now that I'm wiser, I should fix it.
+;       (getValueAt [row col]
+;         (if (= -1 row col)
+;           column-key-map
+;           (if (= -1 col)
+;             (get @full-values row)
+;             (let [^javax.swing.table.DefaultTableModel this this]
+;               (proxy-super getValueAt row col)))))
+;       (setValueAt [value row col]
+;         (if (= -1 col)
+;           (swap! full-values assoc row value)
+;           (let [^javax.swing.table.DefaultTableModel this this]
+;             (proxy-super setValueAt value row col))))
+;       (getColumnClass [^Integer c]
+;         (proxy-super getColumnClass c)
+;         (nth column-classes c)))))
+;         (defn -main [& args]
+;           "メイン関数."
+;           (println args))
+;
