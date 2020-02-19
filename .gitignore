@@ -1,0 +1,3 @@
+# 特定のディレクトリを無視する場合は先頭と末尾に/を付ける
+example/SystemTrayApp/bin/
+example/SystemTrayApp/.gitignore

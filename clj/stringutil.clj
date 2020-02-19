@@ -1,0 +1,6 @@
+(ns swing-clip.stringutil)
+;(defn char->dbname [charval](let [ isupper (< (int charval) 97) ](if isupper ( list \_ charval ) charval)))
+;(defn castr->dbname[str]((fn [ca](->(map char->dbname ca) (flatten) (clojure.string/join  ) ) ) ( char-array  str) ))
+(defn str->dbname[strtext](clojure.string/replace strtext #"[A-Z]" #(-> (str \_ %))))
+(defn dbname->str[strtext](clojure.string/replace strtext #"_." #(-> (. % charAt 1) (clojure.string/upper-case ))))
+(defn strlist->dbname[somelist](map #((fn [ca](->(map char->dbname ca) (flatten) (clojure.string/join  ) ) )  %) (map char-array  somelist) ))

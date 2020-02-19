@@ -13,6 +13,7 @@
                    [reply "0.3.7"]
                    [org.clojure/tools.namespace "0.3.1"]
                    [org.apache.commons/commons-lang3 "3.9"]
+                   [org.tcrawley/dynapath "1.0.0"]
 ]
     ;:resource ["lib/*.jar" "lib/*.class"]
     :resource-paths ["lib/jacob.jar"
