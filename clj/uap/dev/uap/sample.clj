@@ -5,10 +5,10 @@
             ;[proto-repl.saved-values]
             [clojure.pprint :as pp]
             [seesaw.core]
-            [uap.java]
+            ;[uap.java]
             [uap.java.classpath]
             [uap.misc]
-            ;[java-jdbc.sql]
+            [java-jdbc.sql]
             [clojure.java.jdbc :as java-jdbc.sql]
             [seesaw.table])
   (:import [java.awt Toolkit] [java.awt.datatransfer Clipboard DataFlavor StringSelection])
