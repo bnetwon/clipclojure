@@ -24,6 +24,9 @@
                    [fipp "0.6.22"] [mvxcvi/arrangement "1.2.0"]
                    [criterium "0.4.5"]
                    [java-jdbc/dsl "0.1.3"]
+                   [org.clojure/data.csv "1.0.0"]
+                   [djblue/portal "0.21.2"]
                  ]
   :source-paths ["src" "dev"]
+  :java-source-paths ["java_src"]
   :repl-options {:init-ns uap.core})

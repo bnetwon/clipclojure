@@ -14,6 +14,7 @@
   (:import [java.awt Toolkit] [java.awt.datatransfer Clipboard DataFlavor StringSelection])
   ;(:use[user])
   )
+(def labelStr "insert into aeonbo.CBM_LABEL_PRT (I_COMPANYCODE,I_STORECODE,STR_PRINTER_CODE,STR_PRINTTYPE,STR_PRINTERNAME,STR_PRINTERADDRESS,STR_HOUSEDIRECTORY,STR_FTPUSER,STR_FTPPASSWORD,STR_MAKEINF,I_MAKEDATETIME,STR_LASTUPDATEINF,I_LASTUPDATEDATETIME,STR_PRINTERADDRESS_STAND,I_PRIORITY) values ('6400','804010','$IP','30','$NAME','$IP','PRTDATA','HQMDBO','mdbo','VINX','to_number(to_char(localtimestamp, 'yyyymmddhh24missff2'))','VINX','to_number(to_char(localtimestamp, 'yyyymmddhh24missff2'))','$IP','2') ")
 
 (declare pathlist-seq)
 ;(require '[clojure.java.data :as j])

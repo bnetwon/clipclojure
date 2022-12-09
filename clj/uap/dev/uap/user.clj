@@ -10,6 +10,7 @@
   (:import [java.awt Toolkit] [java.awt.datatransfer Clipboard DataFlavor StringSelection])
   (:use [seesaw core table][clojure.repl])
   )
+(require '[clojure.data.csv :as csv] '[clojure.java.io :as io])
 (defn ins->map[obj](->> obj
      cr/reflect
      :members (map #( (fn[x] ( into {}  x)) %)) vec
@@ -149,6 +150,15 @@
          cframe     (center-frame (:table tablemap)) ]
    (-> tablemap (assoc :frame cframe ))
   ))
+
+(defn makesomelist []
+  (do (def somelist
+        (clojure.string/split (get-string) #"\n"))
+    somelist))
+
+  
+(defn delcomma [str](clojure.string/replace str "," ""))
+(defn delbkt [str](clojure.string/replace str "\\)" ""))
 
 ; (defn- ^javax.swing.table.DefaultTableModel proxy-table-model
 ;   [column-names column-key-map column-classes]

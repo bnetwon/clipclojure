@@ -1,8 +1,8 @@
 (ns swing-clip.clipboard
-  (:require [clojure.core.async])
+  (:require [clojure.core.async] )
   (:import [java.awt Toolkit]
            [java.awt.datatransfer Clipboard DataFlavor StringSelection])
-  (:use [clojure.tools.namespace.repl :only (refresh)]))
+  (:use [clojure.tools.namespace.repl :only (refresh)] ))
 ;(import [java.awt Toolkit] [java.awt.datatransfer Clipboard DataFlavor StringSelection])
 ;(.replace (get-string) "\n" "" )
 ;(def atom-recur (atom true))

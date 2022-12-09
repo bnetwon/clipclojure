@@ -1,3 +1,8 @@
 # 特定のディレクトリを無視する場合は先頭と末尾に/を付ける
 example/SystemTrayApp/bin/
 example/SystemTrayApp/.gitignore
+clj/ctray/.git
+clj/ctray/.nrepl-port
+clj/ctray/.gitignore
+clj/ctray/.hgignore
+clj/ctray/.lein-repl-history
