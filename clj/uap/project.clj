@@ -29,4 +29,6 @@
                  ]
   :source-paths ["src" "dev"]
   :java-source-paths ["java_src"]
-  :repl-options {:init-ns uap.core})
+  :repl-options {:init-ns uap.core}
+  :repl {:plugins [[cider/cider-nrepl "0.29.0"]]}
+  )
