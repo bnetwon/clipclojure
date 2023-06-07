@@ -3,16 +3,28 @@
   (:import [java.awt Toolkit]
            [java.awt.datatransfer Clipboard DataFlavor StringSelection])
   (:use [clojure.tools.namespace.repl :only (refresh)] ))
-;(import [java.awt Toolkit] [java.awt.datatransfer Clipboard DataFlavor StringSelection])
+(defn flip [f]
+  (fn [& xs]
+    (apply f (reverse xs))))
+(def split-flip 
+  (flip clojure.string/split))
+
+;(import [java.awt Toolkit] [java.awt.datatransfer Clipboard DataFlavor StringSelection]])
 ;(.replace (get-string) "\n" "" )
 ;(def atom-recur (atom true))
+;(require 'inspector.core)
+;(require '[inspector.core :refer [?]])
 ;(partition 2 (map #(Integer/parseInt %) (clojure.string/split nums #" ")))
 (def env (atom { :clip-watch true , :clip-sleep 2000 }))
+(def oldclipms (atom 0))
+(def newclipms (atom 0))
+(def currclip (atom ""))
 
 (def ^Clipboard clip (.getSystemClipboard (Toolkit/getDefaultToolkit)))
 (defn get-string []
   (when (.isDataFlavorAvailable clip DataFlavor/stringFlavor)
     (.getData clip DataFlavor/stringFlavor)))
+
 (defn get-filelist []
   (when (.isDataFlavorAvailable clip DataFlavor/javaFileListFlavor)
     (.getData clip DataFlavor/javaFileListFlavor)))
@@ -42,6 +54,7 @@
 (defn set-string [s]
   (let [ss (StringSelection. (print-str s))]
     (.setContents clip ss ss)))
+(defn clip-change [tfn] (set-string (tfn (get-string))))
 (defn change[ a b ](set-string (clojure.string/replace (get-string) a b)))
 (defn changes[ a b ](set-string (clojure.string/replace (get-string) a b)))
 (defn set-list[s] (set-string (clojure.string/join "\n" s)))
@@ -121,7 +134,7 @@
 
 ; (println (rrten datastore/finestore "201706201626200000800110000001R32321945972017062000000100000023000025    +000010  0200009700000000000000005  ")
 
-; (proto-repl-charts.charts/line-chart
+; (Proto-repl-charts.charts/line-chart
 ;  "Trigonometry"
 ;  {"sin" (map #(Math/sin %) (range 0.0 6.0 ;0.2))
 ;   "cos" (map #(Math/cos %) (range 0.0 6.0 0.2))})
@@ -170,8 +183,14 @@
         {row-name {column-name element}}))))
 
 (defmacro maketable[] '(def table
-                        (->
+                         (->
                           (get-string)
     
                           parse-table)))
 
+(def flavorListener (reify java.awt.datatransfer.FlavorListener (^void flavorsChanged [this #^java.awt.datatransfer.FlavorEvent changed] 
+                                                                 (doto  (Thread. (Thread/sleep 300) (try (when (.isDataFlavorAvailable clip DataFlavor/stringFlavor) (do 
+    (reset! currclip (.getData clip DataFlavor/stringFlavor)))) ( catch Exception e   )  ))))))
+;;;clear listener
+;(map #(.removeFlavorListener clip %1)  ( .getFlavorListeners clip))
+( .addFlavorListener clip ^java.awt.datatransfer.FlavorListener flavorListener )

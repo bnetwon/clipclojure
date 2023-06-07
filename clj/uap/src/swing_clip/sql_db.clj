@@ -15,10 +15,15 @@
          ;; so we can still get at clojure.core functions:
          '[clojure.core :as c])
 
+(def libdb
+  {:classname   "org.sqlite.JDBC"
+   :subprotocol "sqlite"
+   :subname     "db/lib_db.db"})
+
 (def cdb
   {:classname   "org.sqlite.JDBC"
    :subprotocol "sqlite"
-   :subname     "db/sql_db.db"})
+   :subname     "db/sql_db.db"} )
 
 (defn gettablename [^String pstr  ]
 (let 

@@ -1,8 +1,17 @@
 (ns uap.marshall.initdb
   "Classpath into db"
   (:require
-   [uap.java.classpath :as cp])
+   [clojure.string :as str]
+   [uap.java.classpath :as cp]
+   [uap.misc :as misc]
+   [clojure.java.io :as io]
+   [dynapath.util :as dp]
    [uap.misc :as misc])
+  (:import
+   (java.io File)
+   (java.nio.file Paths)
+   (java.util.jar JarFile JarEntry)
+   (java.net URI URL))
   )
 
 ;;; Classloaders

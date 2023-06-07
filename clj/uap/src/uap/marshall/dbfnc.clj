@@ -63,12 +63,14 @@
   []
   (clojure.java.jdbc/query dbspec ["select * from news"]))
 
+
 (defn -main
   "launch!"
   []
   (create-db)
   (clojure.java.jdbc/insert! dbspec :news testdata)
-  (print-result-set (output)))
+  ;; (print-result-set (output)
+  )
 
 ;' (.mkdir (java.io.File. "/path/to/dir/to/create"))
 ;=> #clojure.reflect.Constructor{:name "do_reflect", 
@@ -119,3 +121,14 @@
 ;;       :identifiers clojure.string/lower-case           ;;(d)
 ;;       :as-arrays? false)                               ;;(e)
 ;;(drop-table-ddl :foo :entities clojure.string/upper-case)
+
+
+;;CREATE TABLE IF NOT EXISTS products (
+;;    id          INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+;;    name        TEXT    NOT NULL,
+;;    description TEXT    NULL,
+;;    price       INTEGER NOT NULL,
+;;    discount    INTEGER NOT NULL DEFAULT 0,
+;;    reg_date    TEXT    NOT NULL
+;;);
+;;SQLite Q
