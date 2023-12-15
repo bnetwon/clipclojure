@@ -1,8 +1,10 @@
+
+
 (ns swing-clip.clipboard
   (:require [clojure.core.async] )
   (:import [java.awt Toolkit]
            [java.awt.datatransfer Clipboard DataFlavor StringSelection])
-  (:use [clojure.tools.namespace.repl :only (refresh)] ))
+  (:use [clojure.tools.namespace.repl :only [refresh]] ))
 (defn flip [f]
   (fn [& xs]
     (apply f (reverse xs))))
@@ -194,3 +196,31 @@
 ;;;clear listener
 ;(map #(.removeFlavorListener clip %1)  ( .getFlavorListeners clip))
 ( .addFlavorListener clip ^java.awt.datatransfer.FlavorListener flavorListener )
+
+(defn lazy-file-lines [file]
+  (letfn [(helper [rdr]
+                  (lazy-seq
+                    (if-let [line (.readLine rdr)]
+                      (cons line (helper rdr))
+                      (do (.close rdr) nil))))]
+         (helper (clojure.java.io/reader file :encoding "UTF-8"))))
+;You can map, reduce, count, etc. over this lazy sequence:
+
+;(count (lazy-file-lines "/tmp/massive-file.txt"))
+
+(defn raw-multi-split-at[ spvec chvec ]
+
+       (loop [ spvec spvec chvec chvec   ]
+       (let [cntspvec (count spvec)
+             splited ( split-at (first spvec ) chvec) 
+             splitfn (fn [ sp  chvec]())]
+       (if ( < (count spvec)  2) splited (cons (first splited) (raw-multi-split-at (rest spvec) (second splited))) )
+       )
+ )
+)
+(defn multi-split-at[ spvec chvec ](map #(apply str %) (raw-multi-split-at spvec chvec )))
+
+(defn string-multi-split-at [ spvec chvec   ]
+( map (fn [a] ( do (new String (byte-array a) "SJIS"))) (raw-multi-split-at spvec(.getBytes chvec "SJIS")))
+  )
+(defn file2excel[](let [rg (re-matches #"(.*/)(.*?)$" (get-string)) dir (second rg) file (nth  rg 2) ] (set-string (str dir "\t" file ) ) ))
