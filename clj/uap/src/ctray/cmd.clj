@@ -131,12 +131,12 @@
          pb (doto (ProcessBuilder.  [])  (.redirectErrorStream  false) (.command  ["cmd"]))
          pi (.start pb)
          rdr (doto (clojure.java.io/reader (.getInputStream  pi) :encoding (:encoding args))
-               (prn)
+               ;(prn)
                (#(clojure.core.async/go-loop [rdr %] (do ;(.append ta (.readLine rdr))
                                                          ;(.append ta "\r\n")
-                                                          (.append ta (slurp rdr))
-                                                         (.setCaretPosition ta (.getLength (.getDocument ta)))
-                                                         (if @aflag  (do (recur rdr)))))))
+                                                       (.append ta (str (char (.read rdr))))
+                                                       (.setCaretPosition ta (.getLength (.getDocument ta)))
+                                                       (if @aflag  (do (recur rdr)))))))
          wrr (clojure.java.io/writer (.getOutputStream pi) :encoding "SJIS")
          enter-action (seesaw.core/action :name "Enter" :handler (fn [e] (do
                                                                            (.write wrr (seesaw.core/config tf :text))
@@ -153,7 +153,8 @@
        (seesaw.core/config! enter :action enter-action)
        (seesaw.core/config! clear :action clear-action)
        (seesaw.core/config! cframe :content cpanel)
-       (seesaw.core/listen cframe :window-closed (fn [e] (reset! aflag false)))
+       (seesaw.core/listen cframe :window-closed (fn [e] (do (prn "window closed") 
+(reset! aflag false))))
        (.setSize cframe 300 300)
        {:frame cframe
         , :enter-action enter-action
@@ -162,8 +163,8 @@
         , :content ta
         , :input tf
         , :aFlag aflag
-        , :rdr   rdr
-}))))
+        , :processbuilder pb
+        , :rdr   rdr}))))
 
 
 

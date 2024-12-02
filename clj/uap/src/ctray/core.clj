@@ -1,5 +1,5 @@
 (ns ctray.core
- (:require [ctray.state :refer [*runtime-state]])
+ (:require [ctray.state :refer [*runtime-state]] [ctray.cmd])
  (:import [java.awt AWTException]
           [java.awt Image]
           [java.awt MenuItem]
@@ -43,6 +43,15 @@
                      ))
 (def dispose-menu-item  (doto ( new MenuItem "Dispose" )(.addActionListener (reify ActionListener(actionPerformed [this e](do (prn e) (. (@*runtime-state :tray) remove (@*runtime-state :tray-icon)) ) ) ))
                      ))
+
+(defn cmd-menu-item ([] (cmd-menu-item {:title "cmd"}))
+  ([maps] (if (nil? (@*runtime-state :cmd-menu))
+            (do (swap! *runtime-state assoc :cmd-map (ctray.cmd/cmd-frame-atom-map))
+                (swap! *runtime-state assoc :cmd ((@*runtime-state :cmd-map) :frame))
+                (swap! *runtime-state assoc :cmd-menu (doto (new MenuItem (maps :title))
+                                                        (.addActionListener (reify ActionListener (actionPerformed [this e]
+                                                                                                    (do (prn e) (. (@*runtime-state :cmd) setVisible true)))))))))))
+(defn add-cmd [] (.add (@*runtime-state :popup-menu) (@*runtime-state :cmd-menu)))
 (defn init[] ( do
                  (swap! *runtime-state assoc
                       :prefs (.node (Preferences/userRoot) "ctray"))
