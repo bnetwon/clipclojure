@@ -1,37 +1,37 @@
-(ns stawt.system_tray 
- (:import [java.awt.AWTException   ]  
- [java.awt.Image                   ]
- [java.awt.MenuItem                ]
- [java.awt.PopupMenu               ]
- [java.awt.SystemTray              ]
- [java.awt.TrayIcon                ]
- [java.awt.event.ActionEvent       ]
- [java.awt.event.ActionListener    ]
- [java.awt.image.BufferedImage     ]
- [java.io.File                     ]
- [java.io.IOException              ]
- [java.util.ArrayList              ]
- [javax.imageio.ImageIO;           ]
- ))
+package bsta.main;
+import java.awt.AWTException;
+import java.awt.Image;
+import java.awt.MenuItem;
+import java.awt.PopupMenu;
+import java.awt.SystemTray;
+import java.awt.TrayIcon;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 
-    (declare  ^SystemTray tray )
-    (declare  ^TrayIcon trayIcon)
-    (declare  ^PopupMenu popup )
-    (declare  ^atom  exit_act )
+import javax.imageio.ImageIO;
 
-    (defn init
-              (if (SystemTray/isSupported)
-     (do ;get the SystemTray instance
-        (def tray  SystemTray/getSystemTray)
-        (def exit_act ( atom (reify ActionListener (actionPerformed [this e](prn e) ) ))
-        ;// load an image
-        (let [ rimage ( ImageIO/read(new File("./resource/TrayIcon.png") ))
-               tk     (Toolkit/getDefaultToolkit) 
-               act    (reify ActionListener (actionPerformed [this e](prn e) ))  ]
-               ())
+import org.imgscalr.Scalr;
+import org.imgscalr.Scalr.Method;
+
+
+public class SystemTrayApp {
+    SystemTray tray = null;
+    TrayIcon trayIcon = null;
+    PopupMenu popup = null;
+
+    public void init(){
+
+    if (SystemTray.isSupported()) {
+        // get the SystemTray instance
+        tray = SystemTray.getSystemTray();
+        // load an image
         BufferedImage rimage = null;
         try {
-            rimage = ImageIO.read(new File("./resource/TrayIcon.png"));
+            rimage = ImageIO.read(new File("./resources/TrayIcon.png"));
         } catch (IOException e1) {
             e1.printStackTrace();
         }

@@ -38,7 +38,9 @@
                  ;[com.microsoft.sqlserver/mssql-jdbc "12.2.0.jre11"]
                  [com.microsoft.sqlserver/mssql-jdbc "11.2.3.jre17"]
                  [seancorfield/next.jdbc "1.0.0"]
-                 [djblue/portal "0.42.0"]]
+                 [org.slf4j/jcl-over-slf4j "1.7.36"]
+                 [saberstack/loop "0.2.3"]
+                 [djblue/portal "0.57.1"]]
 
   :source-paths ["src" "dev"]
   :java-source-paths ["java_src"]

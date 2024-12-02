@@ -1,5 +1,4 @@
 
-
 (ns swing-clip.clipboard
   (:require [clojure.core.async] )
   (:import [java.awt Toolkit]
