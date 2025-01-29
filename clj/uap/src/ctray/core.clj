@@ -73,7 +73,7 @@
                        popup-icon    (make-tray-menu)
                         ]
                               (do (.add popup-icon default-item)
-                                  (.add tray  (@*runtime-state :tray-icon))
+                                  (.insert tray  (@*runtime-state :tray-icon) 2)
                               )
                    )
                 ))
