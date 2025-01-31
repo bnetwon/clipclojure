@@ -40,15 +40,20 @@
                  [seancorfield/next.jdbc "1.0.0"]
                  [org.slf4j/jcl-over-slf4j "1.7.36"]
                  [saberstack/loop "0.2.3"]
-                 [djblue/portal "0.57.1"]]
+                 [djblue/portal "0.58.5"]]
 
   :source-paths ["src" "dev"]
   :java-source-paths ["java_src"]
-  :repl-options {:init-ns uap.core}
+  :repl-options {:init-ns uap.core
+                 :nrepl-middleware [portal.nrepl/wrap-repl]}
   :repl {:plugins [[cider/cider-nrepl "0.31.0"]
                    [refactor-nrepl "3.6.0"]
                    [lein-try "0.4.3"]]
          :dependencies [[nrepl "1.0.0"]
                        [alembic "0.3.2"]]}
+
+;  :plugins [[lein-tools-deps "0.4.1"]]
+;  :middleware [lein-tools-deps.plugin/resolve-dependencies-with-deps-edn]
+;  :lein-tools-deps/config {:config-files [:install :user :project]}
 
   )

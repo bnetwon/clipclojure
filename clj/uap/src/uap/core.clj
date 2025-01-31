@@ -152,7 +152,23 @@ if ls (reset! lastFile ls) @lastFile )))
 ;;(split-bytes "abcde" 1 1 1 1)
 (use 'swing-clip.clipboard)
 (use 'swing-clip.sql)
-
+(defn testa [](ssl/go-loop
+                  ^{:id 300}
+                  [i 0]
+                  (println i)
+                  (a/<! (a/timeout 5000))
+                  (recur (inc i)))
+)
+(defn initfilewatch [] (ssl/go-loop
+                         ^{:id 301}
+                         [tmpfile nil]
+                          (do (if tmpfile (reset! lastFile tmpfile))
+                              (recur (a/<!! @filechan)))))
+(defn initstringwatch [] (ssl/go-loop
+                         ^{:id 302}
+                         [tmpstring nil]
+                          (do (if tmpfile (reset! lastString tmpstring))
+                              (recur (a/<!! @stringchan)))))
 ;;(use 'swing-clip.sqldb)
 ;(require 'inspector.core)
 ;
