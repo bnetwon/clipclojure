@@ -167,7 +167,7 @@ if ls (reset! lastFile ls) @lastFile )))
 (defn initstringwatch [] (ssl/go-loop
                          ^{:id 302}
                          [tmpstring nil]
-                          (do (if tmpfile (reset! lastString tmpstring))
+                          (do (if tmpstring (reset! lastString tmpstring))
                               (recur (a/<!! @stringchan)))))
 ;;(use 'swing-clip.sqldb)
 ;(require 'inspector.core)

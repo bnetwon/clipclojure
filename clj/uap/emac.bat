@@ -1,0 +1,1 @@
+emacs .\src\uap\core.clj

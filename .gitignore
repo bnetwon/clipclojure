@@ -1,4 +1,4 @@
-# “Á’è‚ÌƒfƒBƒŒƒNƒgƒŠ‚ğ–³‹‚·‚éê‡‚Íæ“ª‚Æ––”ö‚É/‚ğ•t‚¯‚é
+# ï¿½ï¿½ï¿½ï¿½Ìƒfï¿½Bï¿½ï¿½ï¿½Nï¿½gï¿½ï¿½ï¿½ğ–³ï¿½ï¿½ï¿½ï¿½ï¿½ê‡ï¿½Íæ“ªï¿½Æ–ï¿½ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½tï¿½ï¿½ï¿½ï¿½
 example/SystemTrayApp/bin/
 example/SystemTrayApp/.gitignore
 clj/ctray/.git
@@ -6,3 +6,5 @@ clj/ctray/.nrepl-port
 clj/ctray/.gitignore
 clj/ctray/.hgignore
 clj/ctray/.lein-repl-history
+.clj-kondo/.cache/v1/java/java.awt.event.InvocationEvent.transit.json
+.lsp/.cache/db.transit.json
